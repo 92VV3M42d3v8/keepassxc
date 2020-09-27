@@ -27,6 +27,8 @@ class DarkStyle : public BaseStyle
 
 public:
     QPalette standardPalette() const override;
+    QIcon
+    standardIcon(StandardPixmap sp, const QStyleOption* opt = nullptr, const QWidget* widget = nullptr) const override;
 
     using BaseStyle::polish;
     void polish(QWidget* widget) override;

@@ -16,6 +16,7 @@
  */
 
 #include "LightStyle.h"
+#include "core/Resources.h"
 #include "gui/ApplicationSettingsWidget.h"
 #include "gui/osutils/OSUtils.h"
 
@@ -90,6 +91,18 @@ QPalette LightStyle::standardPalette() const
     return palette;
 }
 
+QIcon LightStyle::standardIcon(StandardPixmap sp, const QStyleOption* opt, const QWidget* widget) const
+{
+    switch (sp) {
+    case SP_ToolBarHorizontalExtensionButton:
+        return resources()->icon("chevron-double-down");
+    case SP_ToolBarVerticalExtensionButton:
+        return resources()->icon("chevron-double-right");
+    default:
+        return BaseStyle::standardIcon(sp, opt, widget);
+    }
+}
+
 QString LightStyle::getAppStyleSheet() const
 {
     QFile extStylesheetFile(QStringLiteral(":/styles/light/lightstyle.qss"));
@@ -105,16 +118,7 @@ void LightStyle::polish(QWidget* widget)
     if (qobject_cast<QMainWindow*>(widget) || qobject_cast<QDialog*>(widget) || qobject_cast<QMenuBar*>(widget)
         || qobject_cast<QToolBar*>(widget)) {
         auto palette = widget->palette();
-#if defined(Q_OS_MACOS)
-        if (!osUtils->isDarkMode()) {
-            // Let the Cocoa platform plugin draw its own background
-            palette.setColor(QPalette::All, QPalette::Window, Qt::transparent);
-        } else {
-            palette.setColor(QPalette::Active, QPalette::Window, QRgb(0xD6D6D6));
-            palette.setColor(QPalette::Inactive, QPalette::Window, QRgb(0xF6F6F6));
-            palette.setColor(QPalette::Disabled, QPalette::Window, QRgb(0xD4D4D4));
-        }
-#elif defined(Q_OS_WIN)
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
         palette.setColor(QPalette::All, QPalette::Window, QRgb(0xFFFFFF));
 #else
         palette.setColor(QPalette::Active, QPalette::Window, QRgb(0xEFF0F1));

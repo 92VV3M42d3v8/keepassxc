@@ -16,11 +16,13 @@
  */
 
 #include "DarkStyle.h"
+#include "core/Resources.h"
 #include "gui/osutils/OSUtils.h"
 
 #include <QDialog>
 #include <QMainWindow>
 #include <QMenuBar>
+#include <QStyleOption>
 #include <QToolBar>
 
 QPalette DarkStyle::standardPalette() const
@@ -89,6 +91,18 @@ QPalette DarkStyle::standardPalette() const
     return palette;
 }
 
+QIcon DarkStyle::standardIcon(StandardPixmap sp, const QStyleOption* opt, const QWidget* widget) const
+{
+    switch (sp) {
+    case SP_ToolBarHorizontalExtensionButton:
+        return resources()->icon("chevron-double-down");
+    case SP_ToolBarVerticalExtensionButton:
+        return resources()->icon("chevron-double-right");
+    default:
+        return BaseStyle::standardIcon(sp, opt, widget);
+    }
+}
+
 QString DarkStyle::getAppStyleSheet() const
 {
     QFile extStylesheetFile(QStringLiteral(":/styles/dark/darkstyle.qss"));
@@ -104,18 +118,11 @@ void DarkStyle::polish(QWidget* widget)
     if (qobject_cast<QMainWindow*>(widget) || qobject_cast<QDialog*>(widget) || qobject_cast<QMenuBar*>(widget)
         || qobject_cast<QToolBar*>(widget)) {
         auto palette = widget->palette();
-#if defined(Q_OS_MACOS)
-        if (osUtils->isDarkMode()) {
-            // Let the Cocoa platform plugin draw its own background
-            palette.setColor(QPalette::All, QPalette::Window, Qt::transparent);
-        } else {
-            palette.setColor(QPalette::Active, QPalette::Window, QRgb(0x2A2A2A));
-            palette.setColor(QPalette::Inactive, QPalette::Window, QRgb(0x2D2D2D));
-            palette.setColor(QPalette::Disabled, QPalette::Window, QRgb(0x2A2A2A));
-        }
-#elif defined(Q_OS_WIN)
+#if defined(Q_OS_WIN)
         // Register event filter for better dark mode support
         WinUtils::registerEventFilters();
+#endif
+#if defined(Q_OS_WIN) || defined(Q_OS_MAC)
         palette.setColor(QPalette::All, QPalette::Window, QRgb(0x2F2F30));
 #else
         palette.setColor(QPalette::Active, QPalette::Window, QRgb(0x2F2F30));
